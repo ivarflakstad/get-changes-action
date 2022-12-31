@@ -15,15 +15,14 @@ for test_file in test_*.sh; do
       passed=$((passed+1))
     fi
   fi
-  echo "${COLOR_OFF}"
 done
+echo -e "${COLOR_OFF}-------"
 
 total=$((failed+passed))
-echo -e "${GREEN}Summary${COLOR_OFF}"
-echo -e "$total tests run: $passed ${GREEN}passed${COLOR_OFF}, $failed tests ${RED}failed${COLOR_OFF}"
+echo -e "${GREEN}Summary${COLOR_OFF} $total tests run: $passed ${GREEN}passed${COLOR_OFF}, $failed tests ${RED}failed${COLOR_OFF}"
 
 if ((failed!=0)); then
-  return 1
+  exit 1
 else
-  return 0
+  exit 0
 fi
