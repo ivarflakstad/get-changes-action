@@ -50,4 +50,22 @@ assert_eq "$expected" "$actual"
 # Cleanup temp file
 rm "test_get_changes_output.txt"
 
+
+# Let's check with filter that should not match
+export FILTERS="|
+  python: .py
+"
+
+bash get_changes.sh
+
+expected="has_any_changes='false'
+changes=[]"
+
+actual=$(cat $GITHUB_OUTPUT)
+
+assert_eq "$expected" "$actual"
+
+# Cleanup temp file
+rm "test_get_changes_output.txt"
+
 exit 1
