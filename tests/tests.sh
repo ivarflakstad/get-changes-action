@@ -5,13 +5,14 @@ COLOR_OFF='\033[0m'
 passed=0
 failed=0
 
-for test_file in test_*.sh; do
+for test_file in tests/test_*.sh; do
   if [ -f "$test_file" ]; then
-    printf "${GREEN}Running${COLOR_OFF} %s ... " "$test_file"
+    printf "${GREEN}Running${COLOR_OFF} %s " "$test_file"
     if bash "$test_file"; then
       echo -e "${RED}$test_file failed with the above error."
       failed=$((failed+1))
     else
+      echo -e "${COLOR_OFF}"
       passed=$((passed+1))
     fi
   fi

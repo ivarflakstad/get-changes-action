@@ -74,7 +74,7 @@ for row in "${filter_array[@]}"; do
 
     # The '|| true' suffix suppresses 'set -e' for this line. Otherwise we would exit the script
     # if grep didn't find any results.
-    results=$(echo "$diff" | ggrep -E "$regex_trimmed" --) || true
+    results=$(echo "$diff" | grep -E "$regex_trimmed" --) || true
 
     readarray -t result_array <<< "$results"
     results_json=$(jq -ncR '[inputs]' <<< "$results")
@@ -88,7 +88,7 @@ for row in "${filter_array[@]}"; do
       echo "${key}_files=$results_json" >> "$GITHUB_OUTPUT"
       echo "${key}_count=${#result_array[@]}" >> "$GITHUB_OUTPUT"
 
-      changes+=("$filter_key")
+      changes+=("$key")
     fi
   fi
 done
