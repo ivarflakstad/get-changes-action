@@ -1,9 +1,9 @@
-name: Test ivarflakstad/get-changes-action
+name: Test injection
 
 on: push
 
 jobs:
-  test-get-changes:
+  test-injection:
     name: Detect changes
     runs-on: ubuntu-latest
 
@@ -16,9 +16,19 @@ jobs:
       - id: detect
         uses: ./
         with:
+          base: origin/main & echo "fail"
+          commit: HEAD & echo "fail"
           filters: |
+            
             md: **/*.md
+            
             yml: **/*.yaml|**/*.yml
+            
+            
+            $(echo "hey")
+            
+            test_injection: **/*.yaml|**/*.yml"; echo ""; echo "
+          
 
       - name: Check detect outputs
         run: |
@@ -33,4 +43,3 @@ jobs:
           echo "no  ${{ steps.detect.outputs.missing }}"
           echo "no  ${{ steps.detect.outputs.missing_files }}"
           echo "no ${{ steps.detect.outputs.missing_count }}"
-
