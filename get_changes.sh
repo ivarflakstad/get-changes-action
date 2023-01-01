@@ -23,6 +23,8 @@ base=$BASE
 commit=$COMMIT
 # shellcheck disable=SC2153
 filters=$FILTERS
+# shellcheck disable=SC2153
+fetch_depth=$FETCH_DEPTH
 
 # Commit hashes / branch names can only have the following characters
 branch_name_commit_characters="[:alnum:]/\_\-.=><@"
@@ -45,6 +47,10 @@ readarray -t filter_array -- <<< "$filters"
 # Set default 'has_any_changes' value
 echo "has_any_changes='false'" >> "$GITHUB_OUTPUT"
 
+git fetch -q --depth="$fetch_depth"
+while [ -z "$( git merge-base "$base" "$commit" )" ]; do
+    git fetch -q --deepen=100 "$base" "$commit";
+done
 
 # Retrieving diff
 diff=$(git diff --name-only "$base".."$commit")
