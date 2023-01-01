@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - id: yaml linting
+      - id: yaml-lint
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: .
