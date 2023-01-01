@@ -9,14 +9,11 @@ inputs:
     description: Commit to compare with base.
     default: HEAD
   fetch_depth:
-    description: Number of commits to fetch. 0 indicates all history for all branches and tags.
+    description: git fetch depth. 0 indicates all.
     default: '100'
   filters:
     description: Paths to relevant files
     required: true
-  #format:
-  #  description: How should the changes list be formatted?
-  #  default: 'none'
 
 runs:
   using: 'composite'
