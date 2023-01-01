@@ -10,8 +10,7 @@ jobs:
     permissions: read-all
 
     steps:
-      - id: checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - id: yaml linting
         uses: ibiqlik/action-yamllint@v3
         with:
