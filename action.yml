@@ -1,0 +1,35 @@
+name: Detect changes
+description: This action detects relevant changes in repo.
+
+inputs:
+  base:
+    description: Base commit for diff.
+    default: origin/main
+  commit:
+    description: Commit to compare with base.
+    default: HEAD
+  fetch-depth:
+    description: Number of commits to fetch. 0 indicates all history for all branches and tags.
+    default: '0'
+  filters:
+    description: Paths to relevant files
+    required: true
+  #format:
+  #  description: How should the changes list be formatted?
+  #  default: 'none'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect changes
+      id: changes
+      env:
+        BASE: ${{ inputs.base }}
+        COMMIT: ${{ inputs.commit }}
+        FILTERS: ${{ inputs.filters }}
+      run: |
+      
+        echo "$FILTERS"
+        bash get_changes.sh
+
+      shell: bash
