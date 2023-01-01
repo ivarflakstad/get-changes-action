@@ -1,4 +1,6 @@
-source './tests/assert.sh'
+#!/usr/bin/env bash
+
+source ./tests/assert.sh
 
 # Comparing real commits (where README.md and .yml's was added)
 export BASE=778874b109457624c69e6c549c89b679a7650075

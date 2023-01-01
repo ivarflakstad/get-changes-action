@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # The following command makes this bash script slightly more safe. It does the following things:
 # If any command fails the whole script will exit.
 # If any variable is not set it is treated as an error, and the script immediately exits.
