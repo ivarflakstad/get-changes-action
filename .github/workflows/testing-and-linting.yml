@@ -26,13 +26,17 @@ jobs:
         id: tests
         run: bash tests/tests.sh
 
+      - id: date
+        shell: bash
+        run: echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
+
       - id: cache-pip
         uses: actions/cache@v3
         continue-on-error: false
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ $(/bin/date -u "+%Y%m") }}
-          restore-keys: ${{ runner.os }}-pip-${{ $(/bin/date -u "+%Y%m") }}
+          key: ${{ runner.os }}-pip-${{ steps.date.outputs.date }}
+          restore-keys: ${{ runner.os }}-pip-${{ steps.date.outputs.date }}
 
       - if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
         name: Install yamllint
@@ -52,8 +56,10 @@ jobs:
         continue-on-error: false
         with:
           path: shellcheck
-          key: shellcheck-stable-${{ runner.os }}-${{ $(/bin/date -u "+%Y%m") }}
-          restore-keys: shellcheck-stable-${{ runner.os }}-${{ $(/bin/date -u "+%Y%m") }}
+          key: |
+            shellcheck-stable-${{ runner.os }}-${{ steps.date.outputs.date }}
+          restore-keys: |
+            shellcheck-stable-${{ runner.os }}-${{ steps.date.outputs.date }}
 
       - if: ${{ steps.cache-shellcheck.outputs.cache-hit != 'true' }}
         name: Download shellcheck
