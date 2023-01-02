@@ -11,8 +11,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Cache
-        id: cache
+
+      - id: cache-yamllint
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: /usr/local/bin/yamllint
+          key: yamllint-${{ runner.os }}
+          restore-keys: shellcheck-stable-${{ runner.os }}
+
+      - if: ${{ steps.cache-yamllint.outputs.cache-hit != 'true' }}
+        name: Install yamllint
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y python3-pip
+          pip install yamllint
+
+      - name: Run yamllint
+        shell: bash
+        run: yamllint .
+
+      - id: cache-shellcheck
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -20,10 +40,7 @@ jobs:
           key: shellcheck-stable-${{ runner.os }}
           restore-keys: shellcheck-stable-${{ runner.os }}
 
-      #- id: yaml-lint
-      #  uses: ibiqlik/action-yamllint@v3
-
-      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      - if: ${{ steps.cache-shellcheck.outputs.cache-hit != 'true' }}
         name: Download shellcheck
         shell: bash
         run: |
@@ -35,9 +52,9 @@ jobs:
           baseurl="https://github.com/koalaman/shellcheck/releases/download"
           curl -Lso "sc.tar.xz" \
             "${baseurl}/stable/shellcheck-stable.${osvariant}.x86_64.tar.xz"
-          
+
           tar -xf "sc.tar.xz"
-          
+
           mv "shellcheck-stable/shellcheck" "shellcheck"
 
       - name: Run ShellCheck
