@@ -1,0 +1,52 @@
+name: Example
+
+on: push
+
+jobs:
+  example:
+    name: Example
+    runs-on: ubuntu-latest
+
+    permissions: read-all
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+
+      - id: changes
+        uses: ./
+        with:
+          base: 778874b109457624c69e6c549c89b679a7650075
+          commit: 76a3ee7318daa9431e21e0bcd68f97fbac13cd8f
+          filters: |
+            md: .md
+            yml: .yml|.yaml
+            sh: .sh
+
+      # Test any matches
+      - if: ${{ fromJson(steps.changes.outputs.result).has_any_changes != 'true' }}
+        name: Ensure has_any_changes flag has been set
+        run: exit 1  # Should fail if flag is not set
+
+      # Test key matches
+      - if: ${{ fromJson(steps.changes.outputs.result).missing == 'true' }}
+        name: Ensure missing key does not have matches
+        run: exit 1  # Should fail if 'missing' has matches
+
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        name: Ensure no sh changes present
+        run: exit 1  # There should be no changes in .sh files for these commits.
+
+      - if: ${{ fromJson(steps.changes.outputs.result).md != 'true' }}
+        name: Ensure markdown changes present
+        run: exit 1  # If there are no md files matched this should fail.
+
+      - if: ${{ fromJson(steps.changes.outputs.result).yml != 'true' }}
+        name: Ensure yaml changes present
+        run: exit 1  # If there are no yaml files matched this should fail.
+
+      # Test contains functionality result={"md_files":["README.md"],"md_count":1,"yml":"true","yml_files":[".github/workflows/get_changes.yml","action.yml"],"yml_count":2,"changes":["md","yml"]}
+      - if: ${{ !contains(fromJson(steps.changes.outputs.result).md_files, 'README.md') }}
+        name: Ensure README.md is in md_files
+        run: exit 1  # Should fail if 'missing' has matches

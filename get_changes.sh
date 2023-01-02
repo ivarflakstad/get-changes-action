@@ -45,6 +45,9 @@ readarray -t filter_array -- <<< "$filters"
 
 # INPUT DONE
 
+# Set default 'has_any_changes' value
+result="$(jq -n '{has_any_changes: "false"}')"
+
 git fetch -q --depth="$fetch_depth"
 while [ -z "$( git merge-base "$base" "$commit" )" ]; do
     git fetch -q --deepen=100 "$base" "$commit";
@@ -52,9 +55,6 @@ done
 
 # Retrieving diff
 diff=$(git diff --name-only "$base".."$commit")
-
-# Set default 'has_any_changes' value
-result="$(jq -n '{has_any_changes: "false"}')"
 
 changes=()
 for row in "${filter_array[@]}"; do
