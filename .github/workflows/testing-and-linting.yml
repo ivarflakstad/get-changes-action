@@ -13,6 +13,36 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
+
+      - id: get-changes
+        uses: ./
+        with:
+          filters: |
+            md: .md
+            yml: .yaml|.yml
+            sh: .sh
+
+      - name: Check get-changes outputs
+        run: |
+          echo "any ${{ steps.get-changes.outputs.has_any_changes }}"
+          echo "changes ${{ steps.get-changes.outputs.changes }}"
+          
+          echo "md  ${{ steps.get-changes.outputs.md }}"
+          echo "md  ${{ steps.get-changes.outputs.md_files }}"
+          echo "md ${{ steps.get-changes.outputs.md_count }}"
+          
+          echo "yml ${{ steps.get-changes.outputs.yml }}"
+          echo "yml ${{ steps.get-changes.outputs.yml_files }}"
+          echo "yml ${{ steps.get-changes.outputs.yml_count }}"
+          
+          echo "sh  ${{ steps.get-changes.outputs.sh }}"
+          echo "sh  ${{ steps.get-changes.outputs.sh_files }}"
+          echo "sh ${{ steps.get-changes.outputs.sh_count }}"
+          
+          echo "no  ${{ steps.get-changes.outputs.missing }}"
+          echo "no  ${{ steps.get-changes.outputs.missing_files }}"
+          echo "no ${{ steps.get-changes.outputs.missing_count }}"
+
       - id: tests
         run: bash tests/tests.sh
 
