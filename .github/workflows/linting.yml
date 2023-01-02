@@ -12,15 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - id: cache-yamllint
+      - id: cache-pip
         uses: actions/cache@v3
         continue-on-error: false
         with:
-          path: /usr/local/bin/yamllint
-          key: yamllint-${{ runner.os }}
-          restore-keys: shellcheck-stable-${{ runner.os }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: ${{ runner.os }}-pip
 
-      - if: ${{ steps.cache-yamllint.outputs.cache-hit != 'true' }}
+      - if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
         name: Install yamllint
         shell: bash
         run: |
