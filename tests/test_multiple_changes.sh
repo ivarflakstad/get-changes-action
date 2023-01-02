@@ -17,16 +17,7 @@ export FILTERS="|
 
 bash get_changes.sh
 
-expected="has_any_changes='false'
-has_any_changes=true
-md=true
-md_files=[\"README.md\"]
-md_count=1
-has_any_changes=true
-yml=true
-yml_files=[\".github/workflows/get_changes.yml\",\"action.yml\"]
-yml_count=2
-changes=[\"md\",\"yml\"]"
+expected='result={"has_any_changes":"true","md":"true","md_files":["README.md"],"md_count":1,"yml":"true","yml_files":[".github/workflows/get_changes.yml","action.yml"],"yml_count":2,"changes":["md","yml"]}'
 
 actual=$(cat "$GITHUB_OUTPUT")
 

@@ -86,8 +86,7 @@ export GITHUB_OUTPUT="tests/test_get_changes_output.txt"
 
 bash get_changes.sh
 
-expected="has_any_changes='false'
-changes=[]"
+expected='result={"has_any_changes":"false","changes":[]}'
 
 actual=$(cat "$GITHUB_OUTPUT")
 

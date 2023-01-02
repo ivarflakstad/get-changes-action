@@ -14,12 +14,7 @@ export FILTERS="md: .md"
 
 bash get_changes.sh
 
-expected="has_any_changes='false'
-has_any_changes=true
-md=true
-md_files=[\"README.md\"]
-md_count=1
-changes=[\"md\"]"
+expected='result={"has_any_changes":"true","md":"true","md_files":["README.md"],"md_count":1,"changes":["md"]}'
 
 actual=$(cat "$GITHUB_OUTPUT")
 

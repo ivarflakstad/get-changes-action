@@ -14,11 +14,14 @@ inputs:
   filters:
     description: Paths to relevant files
     required: true
-
+outputs:
+  result:
+    description: thing
+    value: ${{ steps.changes.outputs.result }}
 runs:
   using: 'composite'
   steps:
-    - name: Detect changes
+    - name: Get changes
       id: changes
       env:
         BASE: ${{ inputs.base }}

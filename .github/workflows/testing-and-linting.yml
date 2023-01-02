@@ -14,36 +14,16 @@ jobs:
         with:
           fetch-depth: '0'
 
-      - id: get-changes
+      - id: changes
         uses: ./
         with:
           filters: |
             md: .md
-            yml: .yaml|.yml
+            yml: .yml|.yaml
             sh: .sh
 
-      - name: Check get-changes outputs
-        run: |
-          echo "any ${{ steps.get-changes.outputs.has_any_changes }}"
-          echo "changes ${{ steps.get-changes.outputs.changes }}"
-          
-          echo "md  ${{ steps.get-changes.outputs.md }}"
-          echo "md  ${{ steps.get-changes.outputs.md_files }}"
-          echo "md ${{ steps.get-changes.outputs.md_count }}"
-          
-          echo "yml ${{ steps.get-changes.outputs.yml }}"
-          echo "yml ${{ steps.get-changes.outputs.yml_files }}"
-          echo "yml ${{ steps.get-changes.outputs.yml_count }}"
-          
-          echo "sh  ${{ steps.get-changes.outputs.sh }}"
-          echo "sh  ${{ steps.get-changes.outputs.sh_files }}"
-          echo "sh ${{ steps.get-changes.outputs.sh_count }}"
-          
-          echo "no  ${{ steps.get-changes.outputs.missing }}"
-          echo "no  ${{ steps.get-changes.outputs.missing_files }}"
-          echo "no ${{ steps.get-changes.outputs.missing_count }}"
-
-      - id: tests
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        id: tests
         run: bash tests/tests.sh
 
       - id: cache-pip
@@ -51,8 +31,8 @@ jobs:
         continue-on-error: false
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
-          restore-keys: ${{ runner.os }}-pip
+          key: ${{ runner.os }}-pip-${{ $(/bin/date -u "+%Y%m") }}
+          restore-keys: ${{ runner.os }}-pip-${{ $(/bin/date -u "+%Y%m") }}
 
       - if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
         name: Install yamllint
@@ -62,7 +42,8 @@ jobs:
           sudo apt-get install -y python3-pip
           pip install yamllint
 
-      - name: Run yamllint
+      - if: ${{ fromJson(steps.changes.outputs.result).yml == 'true' }}
+        name: Run yamllint
         shell: bash
         run: yamllint .
 
@@ -71,8 +52,8 @@ jobs:
         continue-on-error: false
         with:
           path: shellcheck
-          key: shellcheck-stable-${{ runner.os }}
-          restore-keys: shellcheck-stable-${{ runner.os }}
+          key: shellcheck-stable-${{ runner.os }}-${{ $(/bin/date -u "+%Y%m") }}
+          restore-keys: shellcheck-stable-${{ runner.os }}-${{ $(/bin/date -u "+%Y%m") }}
 
       - if: ${{ steps.cache-shellcheck.outputs.cache-hit != 'true' }}
         name: Download shellcheck
@@ -91,7 +72,8 @@ jobs:
 
           mv "shellcheck-stable/shellcheck" "shellcheck"
 
-      - name: Run ShellCheck
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        name: Run ShellCheck
         shell: bash
         run: |
           echo "Running shellcheck"
