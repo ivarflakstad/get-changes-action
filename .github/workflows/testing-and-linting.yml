@@ -22,6 +22,10 @@ jobs:
             yml: .yml|.yaml
             sh: .sh
 
+      - if: ${{ fromJson(steps.changes.outputs.result).missing == 'true' }}
+        name: Ensure missing key does not have matches
+        run: exit 1  # Should fail if 'missing' has matches
+
       - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
         id: tests
         run: bash tests/tests.sh
