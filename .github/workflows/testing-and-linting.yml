@@ -1,0 +1,93 @@
+name: Testing and linting
+
+on: push
+
+jobs:
+  testing-and-linting:
+    name: Testing and linting
+    runs-on: ubuntu-latest
+
+    permissions: read-all
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+
+      - id: changes
+        uses: ./
+        with:
+          filters: |
+            md: .md
+            yml: .yml|.yaml
+            sh: .sh
+
+      - if: ${{ fromJson(steps.changes.outputs.result).missing == 'true' }}
+        name: Ensure missing key does not have matches
+        run: exit 1  # Should fail if 'missing' has matches
+
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        id: tests
+        run: bash tests/tests.sh
+
+      - id: date
+        shell: bash
+        run: echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
+
+      - id: cache-pip
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ steps.date.outputs.date }}
+          restore-keys: ${{ runner.os }}-pip-${{ steps.date.outputs.date }}
+
+      - if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
+        name: Install yamllint
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip install yamllint
+
+      - if: ${{ fromJson(steps.changes.outputs.result).yml == 'true' }}
+        name: Run yamllint
+        shell: bash
+        run: yamllint .
+
+      - id: cache-shellcheck
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: shellcheck
+          key: |
+            shellcheck-stable-${{ runner.os }}-${{ steps.date.outputs.date }}
+          restore-keys: |
+            shellcheck-stable-${{ runner.os }}-${{ steps.date.outputs.date }}
+
+      - if: ${{ steps.cache-shellcheck.outputs.cache-hit != 'true' }}
+        name: Download shellcheck
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            osvariant="darwin"
+          else
+            osvariant="linux"
+          fi
+          baseurl="https://github.com/koalaman/shellcheck/releases/download"
+          curl -Lso "sc.tar.xz" \
+            "${baseurl}/stable/shellcheck-stable.${osvariant}.x86_64.tar.xz"
+
+          tar -xf "sc.tar.xz"
+
+          mv "shellcheck-stable/shellcheck" "shellcheck"
+
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        name: Run ShellCheck
+        shell: bash
+        run: |
+          echo "Running shellcheck"
+          for file in $(find **/*.sh -type f); do
+            echo "- $file"
+            ./shellcheck $file;
+          done;

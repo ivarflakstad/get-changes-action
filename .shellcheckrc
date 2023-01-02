@@ -1,0 +1,2 @@
+# Disable SC1091 (info): Not following: <source> was not specified as input (see shellcheck -x).
+disable=SC1091

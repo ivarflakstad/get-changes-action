@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # The following command makes this bash script slightly more safe. It does the following things:
 # If any command fails the whole script will exit.
 # If any variable is not set it is treated as an error, and the script immediately exits.
@@ -43,10 +45,6 @@ readarray -t filter_array -- <<< "$filters"
 
 # INPUT DONE
 
-
-# Set default 'has_any_changes' value
-echo "has_any_changes='false'" >> "$GITHUB_OUTPUT"
-
 git fetch -q --depth="$fetch_depth"
 while [ -z "$( git merge-base "$base" "$commit" )" ]; do
     git fetch -q --deepen=100 "$base" "$commit";
@@ -54,6 +52,9 @@ done
 
 # Retrieving diff
 diff=$(git diff --name-only "$base".."$commit")
+
+# Set default 'has_any_changes' value
+result="$(jq -n '{has_any_changes: "false"}')"
 
 changes=()
 for row in "${filter_array[@]}"; do
@@ -88,11 +89,10 @@ for row in "${filter_array[@]}"; do
     if (( ${#result_array} )); then
 
       # If there are matches we write the values.
-      # shellcheck disable=SC2129
-      echo "has_any_changes=true" >> "$GITHUB_OUTPUT"
-      echo "${key}=true" >> "$GITHUB_OUTPUT"
-      echo "${key}_files=$results_json" >> "$GITHUB_OUTPUT"
-      echo "${key}_count=${#result_array[@]}" >> "$GITHUB_OUTPUT"
+      result=$(echo "$result" | jq '.has_any_changes |= "true"')
+      result=$(echo "$result" | jq ".${key} |= \"true\"")
+      result=$(echo "$result" | jq ".${key}_files |= $results_json")
+      result=$(echo "$result" | jq ".${key}_count |= ${#result_array[@]}")
 
       changes+=("$key")
     fi
@@ -102,4 +102,6 @@ done
 # Save list of filter keys that had matches.
 # shellcheck disable=SC2034
 changes_json=$(jq -cnR '$ARGS.positional' --args -- "${changes[@]}")
-echo "changes=$changes_json" >> "$GITHUB_OUTPUT"
+
+result=$(echo "$result" | jq ".changes |= $changes_json")
+echo "result=$(echo "$result" | jq -c)" >> "$GITHUB_OUTPUT"

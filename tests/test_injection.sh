@@ -1,4 +1,6 @@
-source './tests/assert.sh'
+#!/usr/bin/env bash
+
+source ./tests/assert.sh
 
 # Comparing real commits (where README.md was added)
 export BASE=778874b109457624c69e6c549c89b679a7650075
@@ -80,18 +82,14 @@ $;/usr/bin/id"
 export FILTERS
 
 # Store output in a temp file
-export GITHUB_OUTPUT="test_get_changes_output.txt"
+export GITHUB_OUTPUT="tests/test_get_changes_output.txt"
 
 bash get_changes.sh
 
-expected="has_any_changes='false'
-changes=[]"
+expected='result={"has_any_changes":"false","changes":[]}'
 
-actual=$(cat $GITHUB_OUTPUT)
+actual=$(cat "$GITHUB_OUTPUT")
 
 assert_eq "$expected" "$actual"
 
-# Cleanup temp file
-rm "test_get_changes_output.txt"
-
-exit 1
+exit $?
