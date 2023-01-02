@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Store get_changes.sh output in a temp file
+export GITHUB_OUTPUT="tests/test_get_changes_output.txt"
+
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 COLOR_OFF='\033[0m'
@@ -18,6 +21,9 @@ for test_file in tests/test_*.sh; do
       passed=$((passed+1))
     fi
   fi
+
+  # Cleanup temp file
+  rm $GITHUB_OUTPUT || true
 done
 echo -e "${COLOR_OFF}-------"
 

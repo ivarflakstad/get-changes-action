@@ -82,18 +82,15 @@ $;/usr/bin/id"
 export FILTERS
 
 # Store output in a temp file
-export GITHUB_OUTPUT="test_get_changes_output.txt"
+export GITHUB_OUTPUT="tests/test_get_changes_output.txt"
 
 bash get_changes.sh
 
 expected="has_any_changes='false'
 changes=[]"
 
-actual=$(cat $GITHUB_OUTPUT)
+actual=$(cat "$GITHUB_OUTPUT")
 
 assert_eq "$expected" "$actual"
 
-# Cleanup temp file
-rm "test_get_changes_output.txt"
-
-exit 1
+exit $?

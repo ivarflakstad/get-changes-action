@@ -8,7 +8,7 @@ assert_eq() {
   local actual="$2"
 
   if [ "$expected" == "$actual" ]; then
-    printf "\033[0;32m.\033[0m"
+    printf "\033[0;32mpass\033[0m"
     return 1
   else
     echo -e "${RED}fail"
