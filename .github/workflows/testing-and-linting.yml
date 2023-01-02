@@ -1,16 +1,20 @@
-name: Linting
+name: Testing and linting
 
 on: push
 
 jobs:
-  linting:
-    name: Linting
+  testing-and-linting:
+    name: Testing and linting
     runs-on: ubuntu-latest
 
     permissions: read-all
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - id: tests
+        run: bash tests/tests.sh
 
       - id: cache-pip
         uses: actions/cache@v3
