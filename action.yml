@@ -12,11 +12,11 @@ inputs:
     description: git fetch depth. 0 indicates all.
     default: '100'
   filters:
-    description: Paths to relevant files
+    description: Paths to relevant files.
     required: true
 outputs:
   result:
-    description: thing
+    description: JSON containing the matched changes.
     value: ${{ steps.changes.outputs.result }}
 runs:
   using: 'composite'
