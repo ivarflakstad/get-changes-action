@@ -70,7 +70,3 @@ jobs:
       - if: ${{ fromJson(steps.changes.outputs.result).md_count != 1 }}
         name: Ensure md_count == 1
         run: exit 1
-
-      - if: ${{ fromJson(steps.changes.outputs.result).md_count == 1 }}
-        name: Temporary test step that should fail
-        run: exit 1
