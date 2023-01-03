@@ -24,29 +24,49 @@ jobs:
             yml: .yml|.yaml
             sh: .sh
 
+      # If these test steps skip they are valid,
+      # otherwise they will fail with exit code 1.
       # Test any matches
-      - if: ${{ fromJson(steps.changes.outputs.result).has_any_changes != 'true' }}
+      - if: ${{
+              fromJson(steps.changes.outputs.result).has_any_changes != 'true'
+          }}
         name: Ensure has_any_changes flag has been set
-        run: exit 1  # Should fail if flag is not set
+        run: exit 1
 
       # Test key matches
       - if: ${{ fromJson(steps.changes.outputs.result).missing == 'true' }}
         name: Ensure missing key does not have matches
-        run: exit 1  # Should fail if 'missing' has matches
+        run: exit 1
 
       - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
         name: Ensure no sh changes present
-        run: exit 1  # There should be no changes in .sh files for these commits.
+        run: exit 1
 
       - if: ${{ fromJson(steps.changes.outputs.result).md != 'true' }}
         name: Ensure markdown changes present
-        run: exit 1  # If there are no md files matched this should fail.
+        run: exit 1
 
       - if: ${{ fromJson(steps.changes.outputs.result).yml != 'true' }}
         name: Ensure yaml changes present
-        run: exit 1  # If there are no yaml files matched this should fail.
+        run: exit 1
 
-      # Test contains functionality result={"md_files":["README.md"],"md_count":1,"yml":"true","yml_files":[".github/workflows/get_changes.yml","action.yml"],"yml_count":2,"changes":["md","yml"]}
-      - if: ${{ !contains(fromJson(steps.changes.outputs.result).md_files, 'README.md') }}
+      # Test changes list
+      - if: ${{
+              !contains(fromJson(steps.changes.outputs.result).changes, 'md')
+          }}
+        name: Ensure md in changes list
+        run: exit 1
+
+      # Test *_files list
+      - if: ${{
+            !contains(
+              fromJson(steps.changes.outputs.result).md_files, 'README.md'
+            )
+          }}
         name: Ensure README.md is in md_files
-        run: exit 1  # Should fail if 'missing' has matches
+        run: exit 1
+
+      # Test count
+      - if: ${{ fromJson(steps.changes.outputs.result).md_count != 1 }}
+        name: Ensure md_count == 1
+        run: exit 1
