@@ -1,0 +1,72 @@
+name: Usage testing
+
+on: push
+
+jobs:
+  usage-testing:
+    name: Usage testing
+    runs-on: ubuntu-latest
+
+    permissions: read-all
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+
+      - id: changes
+        uses: ./
+        with:
+          base: 778874b109457624c69e6c549c89b679a7650075
+          commit: 76a3ee7318daa9431e21e0bcd68f97fbac13cd8f
+          filters: |
+            md: .md
+            yml: .yml|.yaml
+            sh: .sh
+
+      # If these test steps skip they are valid,
+      # otherwise they will fail with exit code 1.
+      # Test any matches
+      - if: ${{
+              fromJson(steps.changes.outputs.result).has_any_changes != 'true'
+          }}
+        name: Ensure has_any_changes flag has been set
+        run: exit 1
+
+      # Test key matches
+      - if: ${{ fromJson(steps.changes.outputs.result).missing == 'true' }}
+        name: Ensure missing key does not have matches
+        run: exit 1
+
+      - if: ${{ fromJson(steps.changes.outputs.result).sh == 'true' }}
+        name: Ensure no sh changes present
+        run: exit 1
+
+      - if: ${{ fromJson(steps.changes.outputs.result).md != 'true' }}
+        name: Ensure markdown changes present
+        run: exit 1
+
+      - if: ${{ fromJson(steps.changes.outputs.result).yml != 'true' }}
+        name: Ensure yaml changes present
+        run: exit 1
+
+      # Test changes list
+      - if: ${{
+              !contains(fromJson(steps.changes.outputs.result).changes, 'md')
+          }}
+        name: Ensure md in changes list
+        run: exit 1
+
+      # Test *_files list
+      - if: ${{
+            !contains(
+              fromJson(steps.changes.outputs.result).md_files, 'README.md'
+            )
+          }}
+        name: Ensure README.md is in md_files
+        run: exit 1
+
+      # Test count
+      - if: ${{ fromJson(steps.changes.outputs.result).md_count != 1 }}
+        name: Ensure md_count == 1
+        run: exit 1
