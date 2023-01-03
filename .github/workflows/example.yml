@@ -3,7 +3,7 @@ name: Usage testing
 on: push
 
 jobs:
-  usage-testing:
+  example:
     name: Usage testing
     runs-on: ubuntu-latest
 
