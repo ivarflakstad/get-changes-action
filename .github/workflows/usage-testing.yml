@@ -1,10 +1,10 @@
-name: Example
+name: Usage testing
 
 on: push
 
 jobs:
   example:
-    name: Example
+    name: Usage testing
     runs-on: ubuntu-latest
 
     permissions: read-all
