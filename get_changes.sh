@@ -15,8 +15,6 @@ set -euf -o pipefail
 # IFS='' read -r -d '' test <<"EOF" || true
 #  $   {{ inputs.filters }}
 # EOF
-# echo "TEST------------------------"
-# echo "${test}"
 
 # Escape inputs
 # shellcheck disable=SC2153
