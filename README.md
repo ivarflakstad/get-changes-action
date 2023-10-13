@@ -1,6 +1,6 @@
 # get-changes-action
 
-This is a gitHub action that allows you to conditionally run
+This is a GitHub action that allows you to conditionally run
 workflow steps based on changes between commits.
 It is entirely based on a bash script and has no dependencies.
 
